@@ -6,9 +6,10 @@ import { z } from 'nestjs-zod/z';
 export class ValidationService {
   validateWithSchema<T>(schema: z.ZodSchema<T>, data: any): T {
     try {
+      console.log(data);
       const result = schema.safeParse(data);
 
-      console.log(result);
+      console.log(result.error);
       if (!result.success) {
         console.log('here');
         throw new CustomValidationException(result.error.issues); // Use custom exception
