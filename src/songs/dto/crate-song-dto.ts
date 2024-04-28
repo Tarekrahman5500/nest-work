@@ -22,7 +22,7 @@ function validateDurationFormat(durationString: string) {
 // Zod schema for Song data
 export const CreateSongSchema = z
   .object({
-    title: z.string().trim().min(3, 'Title is required'),
+    title: z.string().trim().min(3),
     artists: z.array(z.string().trim()),
     releaseDate: z
       .string()
