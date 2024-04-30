@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
 
-import { z, ZodError } from 'nestjs-zod/z';
+import { z } from 'nestjs-zod/z';
 import { ZodValidationException } from 'nestjs-zod';
 /*import { ZodValidationExceptionFilter } from './zodValidationException';*/
 
 @Injectable()
 export class ValidationService {
-  validateWithSchema<T>(schema: z.ZodSchema<T>, data: any): T {
+  validateWithSchema<T>(schema: z.ZodSchema<T>, req: Request): T {
     try {
-      console.log(data);
-      return schema.parse(data);
+      console.log(req.body);
+      return schema.parse(req.body);
     } catch (error) {
       throw new ZodValidationException(error);
     }

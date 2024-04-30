@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 
 import { ZodValidationException } from 'nestjs-zod';
+import { ApiResponse } from '../response/ApiResponse';
 
 interface ValidationError {
   message: string;
@@ -44,64 +45,48 @@ export class ZodValidationExceptionFilter implements ExceptionFilter {
     //console.log({ length: validationErrors.length });
     if (validationErrors.length > 0) {
       firstError = validationErrors[0];
-      if (firstError.path.includes('params')) {
-        const [param, location] = firstError.path;
-
-        firstError.message = `${location} is ${firstError.message.toLowerCase()} in ${param}`;
-
-        //console.log(firstError.message)
-      } else if (firstError.code === 'custom') {
-        firstError.message = `${firstError.message}`;
-      } else if (firstError.message.toLowerCase() === 'required') {
-        firstError.message = `field ${
-          firstError.path
-        } is ${firstError.message.toLowerCase()}`;
-      } /*else if (firstError.message.includes('must contain at least')) {
-
-                firstError.message = `${firstError.message.toLowerCase()}`
-
-            }*/ else if (firstError.message.includes('must contain')) {
-        // console.log('here')
-
-        firstError.message = `${
-          firstError.path
-        } is ${firstError.message.toLowerCase()}`;
-      } else if (firstError.message.includes('Invalid')) {
-        //  console.log('here')
-
-        //  console.log({path:firstError.path})
-
-        firstError.message = `${
-          firstError.path
-        } has ${firstError.message.toLowerCase()}`;
-      } else if (firstError.message.includes('not match')) {
-        firstError.message = `${
-          firstError.path
-        } is ${firstError.message.toLowerCase()}`;
-      } else if (firstError.message.includes('Expected')) {
-        firstError.message = `${
-          firstError.path
-        } ${firstError.message.toLowerCase()}`;
-      } else if (firstError.path === '') {
-        const match = firstError.message.match(/'(.+?)'/);
-        firstError.message = match
-          ? `unknown filed ${match[1]} in request body`
-          : firstError.message;
-      } else {
-        firstError.message = `${firstError.path} ${firstError.message}`;
+      const lowerCaseMessage = firstError.message.toLowerCase();
+      switch (true) {
+        case firstError.path.includes('params'):
+          const [param, location] = firstError.path;
+          firstError.message = `${location} is ${lowerCaseMessage} in ${param}`;
+          break;
+        case firstError.code === 'custom':
+          firstError.message = `${firstError.message}`;
+          break;
+        case lowerCaseMessage === 'required':
+          firstError.message = `field ${firstError.path} is ${lowerCaseMessage}`;
+          break;
+        case lowerCaseMessage.includes('must contain'):
+        case lowerCaseMessage.includes('invalid'):
+        case lowerCaseMessage.includes('not match'):
+        case lowerCaseMessage.includes('expected'):
+          firstError.message = `${firstError.path} ${lowerCaseMessage}`;
+          break;
+        case firstError.path === '':
+          const match = firstError.message.match(/'(.+?)'/);
+          firstError.message = match
+            ? `unknown field ${match[1]} in request body`
+            : firstError.message;
+          break;
+        default:
+          break;
       }
-
-      console.log(firstError);
-      const errorResponse = {
-        statusCode,
-        timestamp: new Date().toISOString(),
-        path: ctx.getRequest().url,
-        message: firstError.message,
-        data: [],
-        errors: errorData,
-      };
-
-      response.status(statusCode).json(errorResponse);
+    } else {
+      firstError.message = `${firstError.path} ${firstError.message}`;
     }
+
+    console.log(firstError);
+    const errorResponse: ApiResponse<object> = {
+      statusCode,
+      timestamp: new Date().toISOString(),
+      path: ctx.getRequest().url,
+      success: false,
+      message: firstError.message,
+      data: [],
+      errors: errorData.issues,
+    };
+    //return errorResponse;
+    response.status(statusCode).json(errorResponse);
   }
 }

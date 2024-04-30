@@ -1,7 +1,20 @@
-import { Body, Controller, Delete, Get, Post, Put } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Post,
+  Put,
+  Req,
+  UseInterceptors,
+} from '@nestjs/common';
 import { SongsService } from './songs.service';
 import { CreateSongSchema } from './dto/crate-song-dto';
 import { ValidationService } from '../error-handler/validationService';
+import { FormatResponseInterceptor } from '../common/interceptors/format-response.interceptor';
+import { ApiResponse } from '../response/ApiResponse';
+import { ValidationMiddleware } from '../common/validation/middleware';
+import { z } from 'nestjs-zod/z';
 
 @Controller('songs')
 export class SongsController {
@@ -12,16 +25,31 @@ export class SongsController {
 
   @Get()
   findAll() {
-    return this.songService.findAll();
+    console.log('here');
+    const data = { message: 'Hello, world!' };
+
+    // Return data wrapped in ApiResponse
+    console.log(data);
+    return {
+      statusCode: 200,
+      success: true,
+      timestamp: new Date().toISOString(),
+      path: '/example',
+      message: 'Data fetched successfully',
+      data: [data],
+      errors: [],
+    };
+    //return this.songService.findAll();
   }
 
   @Post('create')
-  create(@Body() data: any) {
+  // @UsePipes(new ValidationPipe({ transform: true }))
+  // @Use(new ValidationMiddleware(CreateSongSchema))
+  create(@Req() req: Request) {
     const validatedData = this.validationService.validateWithSchema(
       CreateSongSchema,
-      data,
+      req,
     );
-
     return this.songService.create(validatedData);
   }
 
@@ -38,5 +66,26 @@ export class SongsController {
   @Delete(':id')
   delete() {
     return 'delete';
+  }
+
+  @Get('any')
+  @UseInterceptors(new FormatResponseInterceptor())
+  getData() {
+    // Simulated data
+
+    console.log('here');
+    const data = { message: 'Hello, world!' };
+
+    // Return data wrapped in ApiResponse
+    console.log(data);
+    return {
+      statusCode: 200,
+      success: true,
+      timestamp: new Date().toISOString(),
+      path: '/example',
+      message: 'Data fetched successfully',
+      data: [data],
+      errors: [],
+    };
   }
 }
