@@ -8,7 +8,6 @@ import { ZodValidationException } from 'nestjs-zod';
 export class ValidationService {
   validateWithSchema<T>(schema: z.ZodSchema<T>, req: Request): T {
     try {
-      console.log(req.body);
       return schema.parse(req.body);
     } catch (error) {
       throw new ZodValidationException(error);

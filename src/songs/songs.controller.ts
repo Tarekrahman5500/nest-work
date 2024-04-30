@@ -7,14 +7,17 @@ import {
   Put,
   Req,
   UseInterceptors,
+  UsePipes,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
-import { CreateSongSchema } from './dto/crate-song-dto';
+import { CreateSongDto, CreateSongSchema } from './dto/crate-song-dto';
 import { ValidationService } from '../error-handler/validationService';
 import { FormatResponseInterceptor } from '../common/interceptors/format-response.interceptor';
 import { ApiResponse } from '../response/ApiResponse';
 import { ValidationMiddleware } from '../common/validation/middleware';
 import { z } from 'nestjs-zod/z';
+import { ZodValidationExceptionFilter } from '../error-handler/zodValidationExceptionFilter';
+import { ZodValidationPipe } from 'nestjs-zod';
 
 @Controller('songs')
 export class SongsController {
@@ -43,14 +46,17 @@ export class SongsController {
   }
 
   @Post('create')
-  // @UsePipes(new ValidationPipe({ transform: true }))
   // @Use(new ValidationMiddleware(CreateSongSchema))
-  create(@Req() req: Request) {
-    const validatedData = this.validationService.validateWithSchema(
+  @UsePipes(new ZodValidationPipe(CreateSongDto))
+  create(@Body() createSongDto: any) {
+    /*const validatedData = this.validationService.validateWithSchema(
       CreateSongSchema,
       req,
     );
-    return this.songService.create(validatedData);
+    console.log(validatedData);
+    console.log(req.body);*/
+    console.log(createSongDto);
+    return this.songService.create(createSongDto);
   }
 
   @Get(':id')
