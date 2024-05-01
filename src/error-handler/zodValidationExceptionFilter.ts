@@ -21,7 +21,8 @@ export class ZodValidationExceptionFilter implements ExceptionFilter {
     const response = ctx.getResponse();
 
     const errorData = exception.getZodError();
-    //console.log(errorData.issues);
+
+    //console.log(errorData, response);
     const validationErrors = errorData.issues.map((issue) => {
       const pathSegments = issue.path.join('.').split('.');
       const path = pathSegments.includes('params')

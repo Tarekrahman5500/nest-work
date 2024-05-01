@@ -15,9 +15,27 @@ function validateDateFormat(dateString: string) {
 }
 
 function validateDurationFormat(durationString: string) {
+  // Check if the string is not empty and matches the format mm:ss
   const durationFormatRegex = /^\d{2}:\d{2}$/;
-  return durationFormatRegex.test(durationString);
+  return durationString !== '' && durationFormatRegex.test(durationString);
 }
+
+const BodySchema = z
+  .object({
+    title: z.string().trim().min(3),
+    artists: z.array(z.string().trim()),
+    releaseDate: z
+      .string()
+      .refine(
+        validateDateFormat,
+        'Release date must be in the format yyyy-mm-dd',
+      ),
+    duration: z
+      .string()
+      .refine(validateDurationFormat, 'Duration must be in the format mm:ss'),
+  })
+  .strip()
+  .required();
 
 // Zod schema for Song data
 export const CreateSongSchema = z

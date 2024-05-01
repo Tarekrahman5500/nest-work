@@ -47,14 +47,15 @@ export class SongsController {
 
   @Post('create')
   // @Use(new ValidationMiddleware(CreateSongSchema))
-  @UsePipes(new ZodValidationPipe(CreateSongDto))
-  create(@Body() createSongDto: any) {
+  @UsePipes(new ZodValidationPipe(CreateSongSchema))
+  create(@Body() createSongDto: CreateSongDto, @Req() req: Request) {
     /*const validatedData = this.validationService.validateWithSchema(
       CreateSongSchema,
       req,
     );
     console.log(validatedData);
     console.log(req.body);*/
+    console.log(req.body, req.url);
     console.log(createSongDto);
     return this.songService.create(createSongDto);
   }
