@@ -22,7 +22,7 @@ export class ZodValidationExceptionFilter implements ExceptionFilter {
 
     const errorData = exception.getZodError();
 
-    //console.log(errorData, response);
+    //console.log(errorData.addIssues({issue: ctx.getRequest().url}));
     const validationErrors = errorData.issues.map((issue) => {
       const pathSegments = issue.path.join('.').split('.');
       const path = pathSegments.includes('params')

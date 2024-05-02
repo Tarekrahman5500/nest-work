@@ -41,7 +41,7 @@ const BodySchema = z
 export const CreateSongSchema = z
   .object({
     title: z.string().trim().min(3),
-    artists: z.array(z.string().trim()),
+    artists: z.array(z.string().min(3)),
     releaseDate: z
       .string()
       .refine(

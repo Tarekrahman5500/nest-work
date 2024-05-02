@@ -3,6 +3,9 @@ import {
   Controller,
   Delete,
   Get,
+  HttpStatus,
+  Param,
+  ParseIntPipe,
   Post,
   Put,
   Req,
@@ -14,10 +17,9 @@ import { CreateSongDto, CreateSongSchema } from './dto/crate-song-dto';
 import { ValidationService } from '../error-handler/validationService';
 import { FormatResponseInterceptor } from '../common/interceptors/format-response.interceptor';
 import { ApiResponse } from '../response/ApiResponse';
-import { ValidationMiddleware } from '../common/validation/middleware';
-import { z } from 'nestjs-zod/z';
-import { ZodValidationExceptionFilter } from '../error-handler/zodValidationExceptionFilter';
 import { ZodValidationPipe } from 'nestjs-zod';
+import { CustomHttpException } from '../error-handler/custom.http.exception';
+import { z } from 'nestjs-zod/z';
 
 @Controller('songs')
 export class SongsController {
@@ -33,16 +35,18 @@ export class SongsController {
 
     // Return data wrapped in ApiResponse
     console.log(data);
-    return {
-      statusCode: 200,
-      success: true,
+    //return this.songService.findAll();
+    const response: ApiResponse<any> = {
+      statusCode: HttpStatus.CONFLICT,
+      success: false,
       timestamp: new Date().toISOString(),
       path: '/example',
-      message: 'Data fetched successfully',
-      data: [data],
+      message: 'An error occurred',
+      data: [],
       errors: [],
     };
-    //return this.songService.findAll();
+
+    throw new CustomHttpException('no', HttpStatus.CONFLICT);
   }
 
   @Post('create')
@@ -61,8 +65,10 @@ export class SongsController {
   }
 
   @Get(':id')
-  findOne() {
-    return this.songService.findAll();
+  findOne(@Param('id', new ZodValidationPipe(z.number().int())) id: number) {
+    //return this.songService.findAll();
+
+    return `id of type '${typeof id}'`;
   }
 
   @Put(':id')
