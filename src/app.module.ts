@@ -7,6 +7,7 @@ import { ZodSerializerInterceptor } from 'nestjs-zod';
 import { ZodValidationExceptionFilter } from './error-handler/zodValidationExceptionFilter';
 import { ResponseModule } from './response/response.module';
 import { ValidationMiddleware } from './common/validation/middleware';
+import { DevConfigService } from './common/providers/devConfigService';
 
 @Module({
   imports: [SongsModule, ResponseModule],
@@ -18,6 +19,7 @@ import { ValidationMiddleware } from './common/validation/middleware';
       useClass: ZodValidationExceptionFilter,
     },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
+    { provide: DevConfigService, useClass: DevConfigService },
   ],
 })
 export class AppModule implements NestModule {

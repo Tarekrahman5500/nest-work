@@ -4,6 +4,7 @@ import {
   Delete,
   Get,
   HttpStatus,
+  Inject,
   Param,
   ParseIntPipe,
   Post,
@@ -20,13 +21,18 @@ import { ApiResponse } from '../response/ApiResponse';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { CustomHttpException } from '../error-handler/custom.http.exception';
 import { z } from 'nestjs-zod/z';
+import { Connection } from '../common/constants/connection';
 
 @Controller('songs')
 export class SongsController {
   constructor(
     private readonly songService: SongsService,
     private readonly validationService: ValidationService,
-  ) {}
+    @Inject('CONNECTION')
+    private connection: Connection,
+  ) {
+    console.log(`connection = ${this.connection.CONNECTION_STRING}`);
+  }
 
   @Get()
   findAll() {
@@ -65,7 +71,7 @@ export class SongsController {
   }
 
   @Get(':id')
-  findOne(@Param('id', new ZodValidationPipe(z.number().int())) id: number) {
+  findOne(@Param('id', new ZodValidationPipe(z.string())) id: string) {
     //return this.songService.findAll();
 
     return `id of type '${typeof id}'`;
