@@ -11,12 +11,13 @@ export class ResponseService {
     message: string,
     data: any,
     errors: any,
+    requestUrl: string,
   ): ApiResponse<object> {
     return {
       statusCode: statusCode,
       success: success,
       timestamp: new Date().toISOString(),
-      path: '',
+      path: requestUrl,
       message: message,
       data: data,
       errors: errors,

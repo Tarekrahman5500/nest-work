@@ -20,29 +20,19 @@ function validateDurationFormat(durationString: string) {
   return durationString !== '' && durationFormatRegex.test(durationString);
 }
 
-const BodySchema = z
-  .object({
-    title: z.string().trim().min(3),
-    artists: z.array(z.string().trim()),
-    releaseDate: z
-      .string()
-      .refine(
-        validateDateFormat,
-        'Release date must be in the format yyyy-mm-dd',
-      ),
-    duration: z
-      .string()
-      .refine(validateDurationFormat, 'Duration must be in the format mm:ss'),
-  })
-  .strip()
-  .required();
-
+export interface ICreateSongDto {
+  title: string;
+  artists: string[];
+  releasedDate: Date;
+  duration: Date;
+  lyrics: string | null;
+}
 // Zod schema for Song data
 export const CreateSongSchema = z
   .object({
     title: z.string().trim().min(3),
     artists: z.array(z.string().min(3)),
-    releaseDate: z
+    releasedDate: z
       .string()
       .refine(
         validateDateFormat,
@@ -51,6 +41,7 @@ export const CreateSongSchema = z
     duration: z
       .string()
       .refine(validateDurationFormat, 'Duration must be in the format mm:ss'),
+    lyrics: z.string().min(3).nullable(),
   })
   .strip()
   .required();
