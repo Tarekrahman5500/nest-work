@@ -1,19 +1,27 @@
 import {
   Body,
   Controller,
+  DefaultValuePipe,
   Delete,
   Get,
   HttpStatus,
   Inject,
   Param,
+  ParseIntPipe,
   Post,
   Put,
+  Query,
   Req,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
 import { SongsService } from './songs.service';
-import { CreateSongSchema, ICreateSongDto } from './dto/crate-song-dto';
+import {
+  CreateSongDto,
+  CreateSongSchema,
+  ICreateSongDto,
+  UUIDSchema,
+} from './dto/crate-song-dto';
 import { ValidationService } from '../error-handler/validationService';
 import { FormatResponseInterceptor } from '../common/interceptors/format-response.interceptor';
 import { ApiResponse } from '../response/ApiResponse';
@@ -23,13 +31,17 @@ import { z } from 'nestjs-zod/z';
 import { Connection } from '../common/constants/connection';
 import { UUID } from '../common/constants/types/uuid';
 import { raw } from 'express';
+import {
+  IUpdateSongDto,
+  UpdateSongDto,
+  UpdateSongSchema,
+} from './dto/update-song-dto';
 
 @Controller('songs')
 export class SongsController {
   constructor(
     private readonly songService: SongsService,
     private readonly validationService: ValidationService,
-
     @Inject('CONNECTION')
     private connection: Connection,
   ) {
@@ -37,15 +49,24 @@ export class SongsController {
   }
 
   @Get()
-  async findAll(@Req() req: Request): Promise<ApiResponse<object>> {
-    const songs = await this.songService.findAll();
+  @Get()
+  async findAll(
+    @Req() req: Request,
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page = 1,
+    @Query('limit', new DefaultValuePipe(1), ParseIntPipe) limit = 1,
+  ): Promise<ApiResponse<object>> {
+    limit = limit > 100 ? 100 : limit;
+    const songs = await this.songService.paginate({
+      page,
+      limit,
+    });
     const response: ApiResponse<object> = {
       statusCode: HttpStatus.OK,
       success: false,
       timestamp: new Date().toISOString(),
       path: req.url,
       message: 'Successfully get songs',
-      data: songs,
+      data: [songs],
       errors: [],
     };
 
@@ -54,7 +75,7 @@ export class SongsController {
 
   @Post('create')
   // @Use(new ValidationMiddleware(CreateSongSchema))
-  @UsePipes(new ZodValidationPipe(CreateSongSchema))
+  @UsePipes(new ZodValidationPipe(CreateSongDto))
   async create(
     @Body() createSongDto: ICreateSongDto,
     @Req() req: Request,
@@ -86,7 +107,7 @@ export class SongsController {
   async findOne(
     @Req() req: Request,
     @Param('id', new ZodValidationPipe(z.string())) id: UUID,
-  ) {
+  ): Promise<ApiResponse<object>> {
     //return this.songService.findAll();
 
     const singleSong = await this.songService.findOne(id);
@@ -105,13 +126,46 @@ export class SongsController {
   }
 
   @Put(':id')
-  update() {
-    return 'update';
+  // @UsePipes(new ZodValidationPipe(UUIDSchema))
+  async update(
+    @Req() req: Request,
+    @Param('id', new ZodValidationPipe(UUIDSchema)) id: UUID,
+    //@Param('id') id: UUID,
+    @Body(new ZodValidationPipe(UpdateSongDto)) updateSongDto: IUpdateSongDto,
+  ): Promise<ApiResponse<object>> {
+    //console.log('update', id);
+    const updateSong = await this.songService.updateOne(id, updateSongDto);
+    console.log(updateSong);
+    const response: ApiResponse<object> = {
+      statusCode: HttpStatus.CREATED,
+      success: true,
+      timestamp: new Date().toISOString(),
+      path: req.url,
+      message: 'Successfully updated song',
+      data: updateSong,
+      errors: [],
+    };
+
+    return response;
   }
 
   @Delete(':id')
-  delete() {
-    return 'delete';
+  async delete(
+    @Req() req: Request,
+    @Param('id', new ZodValidationPipe(z.string())) id: UUID,
+  ): Promise<ApiResponse<object>> {
+    const result = await this.songService.removeOne(id);
+    const response: ApiResponse<object> = {
+      statusCode: HttpStatus.CREATED,
+      success: true,
+      timestamp: new Date().toISOString(),
+      path: req.url,
+      message: 'Successfully removed song with id: ' + id,
+      data: [result],
+      errors: [],
+    };
+
+    return response;
   }
 
   @Get('any')

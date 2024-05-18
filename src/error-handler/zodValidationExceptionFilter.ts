@@ -20,7 +20,11 @@ export class ZodValidationExceptionFilter implements ExceptionFilter {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse();
 
+    // console.log(ctx.getRequest().params.id);
+
     const errorData = exception.getZodError();
+
+    console.log(JSON.stringify(errorData, null, 2));
 
     //console.log(errorData.addIssues({issue: ctx.getRequest().url}));
     const validationErrors = errorData.issues.map((issue) => {

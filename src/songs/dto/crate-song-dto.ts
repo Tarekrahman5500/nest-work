@@ -27,11 +27,19 @@ export interface ICreateSongDto {
   duration: Date;
   lyrics: string | null;
 }
-// Zod schema for Song data
-export const CreateSongSchema = z
+
+export const baseSongSchema = z
   .object({
-    title: z.string().trim().min(3),
-    artists: z.array(z.string().min(3)),
+    title: z
+      .string()
+      .trim()
+      .min(3, { message: 'Title must be at least 3 characters long' }),
+    artists: z.array(
+      z.string().min(3, {
+        message: 'Each artist name must be at least 3 characters long',
+      }),
+      { message: 'Artists must be an array of strings' },
+    ),
     releasedDate: z
       .string()
       .refine(
@@ -41,10 +49,17 @@ export const CreateSongSchema = z
     duration: z
       .string()
       .refine(validateDurationFormat, 'Duration must be in the format mm:ss'),
-    lyrics: z.string().min(3).nullable(),
+    lyrics: z
+      .string()
+      .min(3, { message: 'Lyrics must be at least 3 characters long' })
+      .nullable(),
   })
-  .strip()
-  .required();
+  .strip();
+
+// Zod schema for Song data
+export const CreateSongSchema = baseSongSchema.required();
 
 // CreateSongDto class with validation and type safety
 export class CreateSongDto extends createZodDto(CreateSongSchema) {}
+
+export const UUIDSchema = z.string().uuid();
