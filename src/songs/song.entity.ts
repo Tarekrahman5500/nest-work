@@ -1,9 +1,16 @@
-import { BeforeInsert, Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  BeforeInsert,
+  Column,
+  Entity,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { Base } from '../common/constants/base';
 import { UuidService } from '../common/constants/UuidService';
 import { UUID } from '../common/constants/types/uuid';
 import { ISong } from './dto/song.interface';
 import { v4 as uuidv4 } from 'uuid';
+import { PlayList } from '../playlist/playList.entity';
 @Entity('songs')
 export class Song extends Base implements ISong {
   constructor(private readonly uuidService: UuidService) {
@@ -30,6 +37,8 @@ export class Song extends Base implements ISong {
   @Column({ type: 'text' })
   lyrics: string | null;
 
+  @ManyToOne(() => PlayList, (playList) => playList.songs)
+  playList: PlayList;
   @BeforeInsert()
   generateId() {
     if (!this.id) {

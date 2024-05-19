@@ -13,6 +13,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { DataSource } from 'typeorm';
 import { SharedModule } from './shared/shared.module';
 import { Song } from './songs/song.entity';
+import { Artist } from './artist/artist.entity';
+import { User } from './user/user.entity';
+import { PlayList } from './playlist/playList.entity';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -25,7 +28,7 @@ const proConfig = { port: 8080 };
       port: 5432,
       password: 'tarek17',
       username: 'postgres',
-      entities: [Song],
+      entities: [Song, Artist, User, PlayList],
       database: 'spotify-clone',
       synchronize: true,
       url: 'postgres://postgres:tarek17@localhost:5432/spotify-clone?timezone=Asia/Dhaka',
