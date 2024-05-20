@@ -1,5 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'nestjs-zod/z';
+import { IArtist } from '../../artist/artist.entity';
+import { UUID } from '../../common/constants/types/uuid';
 
 // Interface for Song data (optional, for flexibility)
 export type Song = {
@@ -22,7 +24,7 @@ function validateDurationFormat(durationString: string) {
 
 export interface ICreateSongDto {
   title: string;
-  artists: string[];
+  artists: UUID[];
   releasedDate: Date;
   duration: Date;
   lyrics: string | null;
@@ -35,8 +37,8 @@ export const baseSongSchema = z
       .trim()
       .min(3, { message: 'Title must be at least 3 characters long' }),
     artists: z.array(
-      z.string().min(3, {
-        message: 'Each artist name must be at least 3 characters long',
+      z.string().uuid({
+        message: 'Invalid UUID format',
       }),
       { message: 'Artists must be an array of strings' },
     ),

@@ -1,5 +1,5 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import { DeleteResult, Repository } from 'typeorm';
+import { DeleteResult, In, Repository } from 'typeorm';
 import { Song } from './song.entity';
 import { ISong } from './dto/song.interface';
 import { ICreateSongDto } from './dto/crate-song-dto';
@@ -13,17 +13,44 @@ import {
   Pagination,
   IPaginationOptions,
 } from 'nestjs-typeorm-paginate';
+import { Artist, IArtist } from '../artist/artist.entity';
+
 @Injectable()
 export class SongsService {
   // creation of local db
   constructor(
     @InjectRepository(Song) private readonly songRepository: Repository<Song>,
+    @InjectRepository(Artist)
+    private readonly artistRepository: Repository<Artist>,
   ) {}
 
-  async create(song: ICreateSongDto): Promise<ISong> {
+  async validateArtists(artistIds: string[]): Promise<IArtist[]> {
+    const artists = await this.artistRepository.findBy({
+      id: In(artistIds),
+    });
+    const foundArtistIds = artists.map((artist) => artist.id);
+    const unmatchedIds = artistIds.filter((id) => !foundArtistIds.includes(id));
+
+    if (unmatchedIds.length > 0) {
+      throw new CustomHttpException(
+        `Ids of artists ${unmatchedIds} not found`,
+        HttpStatus.NOT_FOUND,
+      );
+    }
+
+    return artists;
+  }
+
+  async create(songDTO: ICreateSongDto): Promise<ISong> {
     try {
       // Create and save the song
-      const newSong = this.songRepository.create(song);
+
+      const artists = await this.validateArtists(songDTO.artists);
+
+      const newSong = this.songRepository.create({
+        ...songDTO,
+        artists,
+      });
       return await this.songRepository.save(newSong);
     } catch (error) {
       throw error;
@@ -58,10 +85,19 @@ export class SongsService {
     try {
       // console.log('Updating');
       const existingSong = await this.findOne(id);
+      if (!existingSong) {
+        throw new CustomHttpException(
+          `Song with id ${id} not found`,
+          HttpStatus.NOT_FOUND,
+        );
+      }
+      const artists = await this.validateArtists(updateSongDto.artists);
       if (existingSong.length) {
         //console.log('Updating', existingSong);
         // Update existing song
-        await this.songRepository.update(id, updateSongDto);
+
+        // Update the song with new data including the validated artists
+        await this.songRepository.update(id, { ...updateSongDto, artists });
         return await this.findOne(id);
       }
 
@@ -73,10 +109,7 @@ export class SongsService {
         );
       }
       // Create a new song
-      const newSong = this.songRepository.create(
-        updateSongDto as ICreateSongDto,
-      );
-      console.log(newSong);
+      const newSong = this.songRepository.create({ ...updateSongDto, artists });
       return [await this.songRepository.save(newSong)];
     } catch (error) {
       throw error;
