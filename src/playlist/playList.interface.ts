@@ -1,7 +1,7 @@
 import { UUID } from '../common/constants/types/uuid';
 import { ISong } from '../songs/dto/song.interface';
 import { IBase } from '../common/constants/types/base';
-import { IUser } from '../user/user.dto';
+import { IUser } from '../user/user.interface';
 
 export interface IPlayList extends IBase {
   id: UUID;

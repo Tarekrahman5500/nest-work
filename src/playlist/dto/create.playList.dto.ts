@@ -6,15 +6,13 @@ import { createZodDto } from 'nestjs-zod';
 export interface ICreatePlayList {
   name: string;
   songs: UUID[];
-  readonly userId: UUID;
+  readonly user: UUID;
 }
 
 export const CreatePlayListSchema = z.object({
-  id: UUIDSchema,
-  uid: z.number().int().positive(),
   name: z.string().min(1),
   songs: z.array(UUIDSchema),
-  userId: UUIDSchema,
+  user: UUIDSchema,
 });
 
 export class CreatePlayListDto extends createZodDto(CreatePlayListSchema) {}

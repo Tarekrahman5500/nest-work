@@ -11,9 +11,10 @@ import { UUID } from '../common/constants/types/uuid';
 import { Song } from '../songs/song.entity';
 import { User } from '../user/user.entity';
 import { v4 as uuidv4 } from 'uuid';
+import { IPlayList } from './playList.interface';
 
 @Entity('playlists')
-export class PlayList extends Base {
+export class PlayList extends Base implements IPlayList {
   @PrimaryGeneratedColumn('uuid')
   id: UUID;
 

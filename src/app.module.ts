@@ -16,6 +16,7 @@ import { Song } from './songs/song.entity';
 import { Artist } from './artist/artist.entity';
 import { User } from './user/user.entity';
 import { PlayList } from './playlist/playList.entity';
+import { PlayListModule } from './playlist/playList.module';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -35,6 +36,7 @@ const proConfig = { port: 8080 };
     }),
     SharedModule,
     SongsModule,
+    PlayListModule,
     ResponseModule,
   ],
   controllers: [AppController],

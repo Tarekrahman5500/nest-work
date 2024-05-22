@@ -1,17 +1,11 @@
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  OneToMany,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { UUID } from '../common/constants/types/uuid';
 import { Base } from '../common/constants/base';
 import { PlayList } from '../playlist/playList.entity';
+import { IUser } from './user.interface';
 
 @Entity('users')
-export class User extends Base {
+export class User extends Base implements IUser {
   @PrimaryGeneratedColumn('uuid')
   id: UUID;
 

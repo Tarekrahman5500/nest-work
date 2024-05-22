@@ -7,6 +7,7 @@ import { Song } from '../songs/song.entity';
 import { User } from '../user/user.entity';
 import { ICreatePlayList } from './dto/create.playList.dto';
 import { CustomHttpException } from '../error-handler/custom.http.exception';
+import { IPlayList } from './playList.interface';
 
 @Injectable()
 export class PlayListsService {
@@ -19,7 +20,7 @@ export class PlayListsService {
     private userRepo: Repository<User>,
   ) {}
 
-  async create(playListDTO: ICreatePlayList): Promise<PlayList> {
+  async create(playListDTO: ICreatePlayList): Promise<IPlayList> {
     // Fetch the songs by their UUIDs
     const songs = await this.songsRepo.findBy({
       id: In(playListDTO.songs),
@@ -34,7 +35,7 @@ export class PlayListsService {
     }
 
     // Fetch the user by their UUID
-    const user = await this.userRepo.findBy({ id: playListDTO.userId });
+    const user = await this.userRepo.findBy({ id: playListDTO.user });
     if (!user) {
       throw new CustomHttpException('User not found', HttpStatus.NOT_FOUND);
     }
@@ -43,6 +44,7 @@ export class PlayListsService {
     const newPlayList = this.playListRepo.create({
       ...playListDTO,
       songs,
+      user: user[0],
     });
 
     return await this.playListRepo.save(newPlayList);
