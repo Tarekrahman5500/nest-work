@@ -10,5 +10,7 @@ export interface IUser extends IBase {
   lastName: string;
   password: string;
   email: string;
-  playLists: IPlayList[];
+  playLists: IPlayList[] | null;
 }
+
+export type OmitPasswordUserPromise = Promise<Omit<IUser, 'password'>>;

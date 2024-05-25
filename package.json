@@ -26,6 +26,8 @@
     "@nestjs/platform-express": "^10.0.0",
     "@nestjs/typeorm": "^10.0.2",
     "@types/morgan": "^1.9.9",
+    "argon2": "^0.40.1",
+    "class-transformer": "^0.5.1",
     "morgan": "^1.10.0",
     "nestjs-typeorm-paginate": "^4.0.4",
     "nestjs-zod": "^3.0.0",

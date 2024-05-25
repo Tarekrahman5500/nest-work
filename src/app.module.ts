@@ -17,6 +17,9 @@ import { Artist } from './artist/artist.entity';
 import { User } from './user/user.entity';
 import { PlayList } from './playlist/playList.entity';
 import { PlayListModule } from './playlist/playList.module';
+import { AuthModule } from './auth/auth.module';
+import { UserService } from './user/user.service';
+import { UserModule } from './user/user.module';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -38,6 +41,8 @@ const proConfig = { port: 8080 };
     SongsModule,
     PlayListModule,
     ResponseModule,
+    AuthModule,
+    UserModule,
   ],
   controllers: [AppController],
   providers: [
