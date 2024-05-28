@@ -20,6 +20,7 @@ import { PlayListModule } from './playlist/playList.module';
 import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
+import { JwtModule } from '@nestjs/jwt';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
