@@ -4,6 +4,11 @@ import { ExtractJwt, Strategy } from 'passport-jwt';
 import { authConstants } from '../auth.constants';
 import { UserService } from '../../user/user.service';
 import { UUID } from '../../common/constants/types/uuid';
+import { IPayload } from '../types/types';
+import { plainToClass } from 'class-transformer';
+import { User } from '../../user/user.entity';
+import { transformUser } from '../../user/utility/transformUse';
+import { IUser } from '../../user/user.interface';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
@@ -15,14 +20,14 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
     });
   }
 
-  async validate(payload: { sub: UUID; email: string }) {
+  async validate(payload: IPayload) {
     // console.log({ payload });
-    const user = await this.userService.findOne(payload.sub);
-    //  console.log(user);
+    const user: User = await this.userService.findOne(payload.userId);
+    // console.log({ ...user, artistId: payload.artistId || null });
     if (!user) {
       throw new UnauthorizedException('User not found');
     }
 
-    return user;
+    return { ...transformUser(user), artistId: payload.artistId };
   }
 }

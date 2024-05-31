@@ -3,6 +3,7 @@ import {
   Column,
   Entity,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { UUID } from '../common/constants/types/uuid';
@@ -11,6 +12,7 @@ import { PlayList } from '../playlist/playList.entity';
 import { IUser } from './user.interface';
 import * as argon2 from 'argon2';
 import { Exclude } from 'class-transformer';
+import { Artist } from '../artist/artist.entity';
 
 @Entity('users')
 export class User extends Base implements IUser {
@@ -29,6 +31,9 @@ export class User extends Base implements IUser {
   @Column()
   @Exclude()
   password: string;
+
+  @OneToOne(() => Artist, (artist) => artist.user)
+  artist: Artist;
 
   @OneToMany(() => PlayList, (playList) => playList.songs)
   playLists: PlayList[];

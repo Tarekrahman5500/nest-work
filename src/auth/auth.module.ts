@@ -5,10 +5,12 @@ import { UserModule } from '../user/user.module';
 import { JwtModule } from '@nestjs/jwt';
 import { authConstants } from './auth.constants';
 import { JwtStrategy } from './strategy';
+import { ArtistModule } from '../artist/artist.module';
 
 @Module({
   imports: [
     UserModule,
+    ArtistModule,
     JwtModule.register({
       secret: authConstants.secret,
       signOptions: { expiresIn: authConstants.expiresIn },

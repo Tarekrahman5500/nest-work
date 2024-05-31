@@ -18,11 +18,13 @@ export class UserService {
     private readonly userRepository: Repository<User>,
   ) {}
 
-  async findOne(id: UUID): Promise<IUser | null> {
+  @UseInterceptors(ClassSerializerInterceptor)
+  async findOne(id: UUID): Promise<User | null> {
     const user = await this.userRepository.findBy({ id });
     return user?.[0] ?? null;
   }
 
+  @UseInterceptors(ClassSerializerInterceptor)
   async findByEmail(email: string): Promise<IUser | undefined> {
     const user = await this.userRepository.findBy({ email });
     return user?.[0] ?? undefined;

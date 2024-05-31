@@ -21,6 +21,9 @@ import { AuthModule } from './auth/auth.module';
 import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
 import { JwtModule } from '@nestjs/jwt';
+import { ArtistService } from './artist/artist.service';
+import { ArtistController } from './artist/artist.controller';
+import { ArtistModule } from './artist/artist.module';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -44,8 +47,9 @@ const proConfig = { port: 8080 };
     ResponseModule,
     AuthModule,
     UserModule,
+    ArtistModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, ArtistController],
   providers: [
     AppService,
     {

@@ -12,6 +12,8 @@ import {
   Put,
   Query,
   Req,
+  Request,
+  UseGuards,
   UseInterceptors,
   UsePipes,
 } from '@nestjs/common';
@@ -36,6 +38,7 @@ import {
   UpdateSongDto,
   UpdateSongSchema,
 } from './dto/update-song-dto';
+import { ArtistsJwtGuard } from '../auth/guard/artists.jwt.guard';
 
 @Controller('songs')
 export class SongsController {
@@ -74,12 +77,10 @@ export class SongsController {
   }
 
   @Post('create')
-  // @Use(new ValidationMiddleware(CreateSongSchema))
+  @UseGuards(ArtistsJwtGuard)
   @UsePipes(new ZodValidationPipe(CreateSongDto))
-  async create(
-    @Body() createSongDto: ICreateSongDto,
-    @Req() req: Request,
-  ): Promise<ApiResponse<object>> {
+  async create(@Body() createSongDto: ICreateSongDto, @Request() request) {
+    console.log(request.user);
     /*const validatedData = this.validationService.validateWithSchema(
       CreateSongSchema,
       req,
@@ -88,19 +89,7 @@ export class SongsController {
     console.log(req.body);*/
     //console.log(req.body, req.url);
     //console.log(createSongDto);
-    const newSong = await this.songService.create(createSongDto);
-
-    const response: ApiResponse<object> = {
-      statusCode: HttpStatus.CREATED,
-      success: true,
-      timestamp: new Date().toISOString(),
-      path: req.url,
-      message: 'Successfully created a new song',
-      data: [newSong],
-      errors: [],
-    };
-
-    return response;
+    return await this.songService.create(createSongDto);
   }
 
   @Get(':id')
