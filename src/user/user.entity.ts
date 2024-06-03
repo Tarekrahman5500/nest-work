@@ -32,6 +32,12 @@ export class User extends Base implements IUser {
   @Exclude()
   password: string;
 
+  @Column({ nullable: true, type: 'text' })
+  twoFASecret: string;
+
+  @Column({ default: false, type: 'boolean' })
+  enable2FA: boolean;
+
   @OneToOne(() => Artist, (artist) => artist.user)
   artist: Artist;
 

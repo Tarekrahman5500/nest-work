@@ -39,6 +39,7 @@ import {
   UpdateSongSchema,
 } from './dto/update-song-dto';
 import { ArtistsJwtGuard } from '../auth/guard/artists.jwt.guard';
+import { CustomRequest } from '../common/constants/custom.request';
 
 @Controller('songs')
 export class SongsController {
@@ -79,7 +80,10 @@ export class SongsController {
   @Post('create')
   @UseGuards(ArtistsJwtGuard)
   @UsePipes(new ZodValidationPipe(CreateSongDto))
-  async create(@Body() createSongDto: ICreateSongDto, @Request() request) {
+  async create(
+    @Body() createSongDto: ICreateSongDto,
+    @Request() request: CustomRequest,
+  ) {
     console.log(request.user);
     /*const validatedData = this.validationService.validateWithSchema(
       CreateSongSchema,

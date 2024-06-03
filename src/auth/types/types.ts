@@ -5,3 +5,7 @@ export interface IPayload {
   userId: UUID;
   artistId?: UUID;
 }
+
+export type Enable2FAType = {
+  secret: string;
+};

@@ -47,4 +47,19 @@ export class UserService {
     // console.log(user.id);
     return await this.findOne(user.id);
   }
+
+  // update user secret key
+
+  async updateUserSecretKey(userId: UUID, secretKey: string): Promise<User> {
+    const updateUser = await this.userRepository.update(
+      { id: userId },
+      { twoFASecret: secretKey, enable2FA: true },
+    );
+
+    console.log(updateUser);
+
+    //if (updateUser.affected)
+
+    return await this.findOne(userId);
+  }
 }

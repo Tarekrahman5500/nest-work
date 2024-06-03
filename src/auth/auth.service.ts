@@ -1,11 +1,18 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UserService } from '../user/user.service';
 import * as argon2 from 'argon2';
 import { OmitPasswordUserPromise } from '../user/user.interface';
 import { ILoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ArtistService } from '../artist/artist.service';
-import { IPayload } from './types/types';
+import { Enable2FAType, IPayload } from './types/types';
+import { UUID } from '../common/constants/types/uuid';
+import * as speakeasy from 'speakeasy';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -43,5 +50,24 @@ export class AuthService {
     };
 
     //return user;
+  }
+
+  async enable2FA(userId: UUID): Promise<Enable2FAType> {
+    const user = await this.userService.findOne(userId);
+
+    if (!user) new NotFoundException(`user with ${userId} not found`);
+
+    if (user.enable2FA) return { secret: user.twoFASecret };
+
+    // if not enable just create one
+
+    const secret = speakeasy.generateSecret();
+    console.log(secret);
+
+    const updateUser = await this.userService.updateUserSecretKey(
+      userId,
+      secret.base32,
+    );
+    return { secret: updateUser.twoFASecret };
   }
 }
