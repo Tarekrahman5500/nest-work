@@ -9,9 +9,11 @@ import { OmitPasswordUserPromise } from '../user/user.interface';
 import { ILoginDto } from './dto/login.dto';
 import { JwtService } from '@nestjs/jwt';
 import { ArtistService } from '../artist/artist.service';
-import { Enable2FAType, IPayload } from './types/types';
+import { Enable2FAType, IPayload, LoginReturn } from './types/types';
 import { UUID } from '../common/constants/types/uuid';
 import * as speakeasy from 'speakeasy';
+import { User } from '../user/user.entity';
+import { UpdateResult } from 'typeorm';
 
 @Injectable()
 export class AuthService {
@@ -32,7 +34,7 @@ export class AuthService {
     return null;
   }
 
-  async login(loginDto: ILoginDto): Promise<{ accessToken: string }> {
+  async login(loginDto: ILoginDto): Promise<LoginReturn> {
     const user = await this.validateUser(loginDto.email, loginDto.password);
 
     if (!user) throw new UnauthorizedException('Invalid credentials');
@@ -44,6 +46,15 @@ export class AuthService {
 
     const payload: IPayload = { email: user.email, userId: user.id };
     if (artist) payload.artistId = artist.id;
+
+    // if user enable 2fa send hi a link
+
+    if (user.enable2FA) {
+      return {
+        validate2FA: 'http://localhost:8080/auth/validate-2fa',
+        message: 'Please sends the one time password from your google app',
+      };
+    }
 
     return {
       accessToken: this.jwtService.sign(payload),
@@ -69,5 +80,32 @@ export class AuthService {
       secret.base32,
     );
     return { secret: updateUser.twoFASecret };
+  }
+
+  async validate2FA(
+    userId: UUID,
+    token: string,
+  ): Promise<{ verified: boolean }> {
+    try {
+      const user = await this.userService.findOne(userId);
+
+      //  console.log(token);
+
+      // now verify user secret with token
+
+      const verified = speakeasy.totp.verify({
+        secret: user.twoFASecret,
+        token,
+        encoding: 'base32',
+      });
+
+      return { verified };
+    } catch (error) {
+      throw new UnauthorizedException('Failed to verify token');
+    }
+  }
+
+  async disable2FA(userId: UUID): Promise<UpdateResult> {
+    return this.userService.disable2FA(userId);
   }
 }

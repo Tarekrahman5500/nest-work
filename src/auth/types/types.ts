@@ -9,3 +9,7 @@ export interface IPayload {
 export type Enable2FAType = {
   secret: string;
 };
+
+export type LoginReturn =
+  | { accessToken: string }
+  | { validate2FA: string; message: string };

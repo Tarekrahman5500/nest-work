@@ -4,7 +4,7 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { User } from './user.entity';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { ICreateUser } from './dto/user.dto';
 import { IUser, OmitPasswordUserPromise } from './user.interface';
@@ -61,5 +61,12 @@ export class UserService {
     //if (updateUser.affected)
 
     return await this.findOne(userId);
+  }
+
+  async disable2FA(id: UUID): Promise<UpdateResult> {
+    return await this.userRepository.update(
+      { id },
+      { enable2FA: false, twoFASecret: null },
+    );
   }
 }

@@ -16,6 +16,8 @@ import { AuthService } from './auth.service';
 import { JwtGuard } from './guard/jwt.guard';
 import { CustomRequest } from '../common/constants/custom.request';
 import { Enable2FAType } from './types/types';
+import { ITokenDto, TokenDTO } from './dto/token.dto';
+import { UpdateResult } from 'typeorm';
 
 @Controller('auth')
 export class AuthController {
@@ -45,5 +47,21 @@ export class AuthController {
   @UseGuards(JwtGuard)
   async enable2FA(@Request() request: CustomRequest): Promise<Enable2FAType> {
     return await this.authService.enable2FA(request.user.id);
+  }
+
+  @Get('disable-2fa')
+  @UseGuards(JwtGuard)
+  disable2FA(@Request() request: CustomRequest): Promise<UpdateResult> {
+    return this.authService.disable2FA(request.user.id);
+  }
+
+  @Post('validate-2fa')
+  @UseGuards(JwtGuard)
+  async validate2FA(
+    @Request() request: CustomRequest,
+    @Body(new ZodValidationPipe(TokenDTO)) tokenDTO: ITokenDto,
+  ): Promise<{ verified: boolean }> {
+    //console.log('validate2FA', tokenDTO);
+    return await this.authService.validate2FA(request.user.id, tokenDTO.token);
   }
 }
