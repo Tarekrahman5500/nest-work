@@ -6,6 +6,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { authConstants } from './auth.constants';
 import { JwtStrategy } from './strategy';
 import { ArtistModule } from '../artist/artist.module';
+import { ApiKeyStrategy } from './strategy';
 
 @Module({
   imports: [
@@ -16,7 +17,7 @@ import { ArtistModule } from '../artist/artist.module';
       signOptions: { expiresIn: authConstants.expiresIn },
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, ApiKeyStrategy],
   controllers: [AuthController],
   exports: [AuthService],
 })

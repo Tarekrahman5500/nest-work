@@ -10,7 +10,7 @@ import {
 import { UserService } from '../user/user.service';
 import { ICreateUser, UserCreateDto } from '../user/dto/user.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
-import { OmitPasswordUserPromise } from '../user/user.interface';
+import { IUser, OmitPasswordUserPromise } from '../user/user.interface';
 import { ILoginDto, LoginDto } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guard/jwt.guard';
@@ -18,6 +18,8 @@ import { CustomRequest } from '../common/constants/custom.request';
 import { Enable2FAType } from './types/types';
 import { ITokenDto, TokenDTO } from './dto/token.dto';
 import { UpdateResult } from 'typeorm';
+import { User } from '../user/user.entity';
+import { AuthGuard } from '@nestjs/passport';
 
 @Controller('auth')
 export class AuthController {
@@ -63,5 +65,11 @@ export class AuthController {
   ): Promise<{ verified: boolean }> {
     //console.log('validate2FA', tokenDTO);
     return await this.authService.validate2FA(request.user.id, tokenDTO.token);
+  }
+
+  @Get('profile')
+  @UseGuards(AuthGuard('bearer'))
+  getProfile(@Request() request: CustomRequest): IUser {
+    return request.user;
   }
 }

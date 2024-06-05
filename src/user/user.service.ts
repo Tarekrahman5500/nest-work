@@ -69,4 +69,8 @@ export class UserService {
       { enable2FA: false, twoFASecret: null },
     );
   }
+
+  async findByApiKey(apiKey: UUID): Promise<User> {
+    return await this.userRepository.findOneBy({ apiKey });
+  }
 }

@@ -2,6 +2,7 @@ import {
   BeforeInsert,
   Column,
   Entity,
+  Generated,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
@@ -31,6 +32,10 @@ export class User extends Base implements IUser {
   @Column()
   @Exclude()
   password: string;
+
+  @Column({ unique: true })
+  @Generated('uuid')
+  apiKey: UUID;
 
   @Column({ nullable: true, type: 'text' })
   twoFASecret: string;
