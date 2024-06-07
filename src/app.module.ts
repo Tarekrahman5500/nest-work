@@ -10,36 +10,29 @@ import { ValidationMiddleware } from './common/validation/middleware';
 import { DevConfigService } from './common/providers/devConfigService';
 import * as process from 'node:process';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { DataSource } from 'typeorm';
 import { SharedModule } from './shared/shared.module';
-import { Song } from './songs/song.entity';
-import { Artist } from './artist/artist.entity';
-import { User } from './user/user.entity';
-import { PlayList } from './playlist/playList.entity';
 import { PlayListModule } from './playlist/playList.module';
 import { AuthModule } from './auth/auth.module';
-import { UserService } from './user/user.service';
 import { UserModule } from './user/user.module';
-import { JwtModule } from '@nestjs/jwt';
-import { ArtistService } from './artist/artist.service';
 import { ArtistController } from './artist/artist.controller';
 import { ArtistModule } from './artist/artist.module';
+import { dataSourceOptions } from '../db/data-source';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import typeorm from './config/typeorm';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      password: 'tarek17',
-      username: 'postgres',
-      entities: [Song, Artist, User, PlayList],
-      database: 'spotify-clone',
-      synchronize: true,
-      url: 'postgres://postgres:tarek17@localhost:5432/spotify-clone?timezone=Asia/Dhaka',
+    ConfigModule.forRoot({
+      isGlobal: true,
+      load: [typeorm],
+    }),
+    TypeOrmModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) =>
+        configService.get('typeorm'),
     }),
     SharedModule,
     SongsModule,

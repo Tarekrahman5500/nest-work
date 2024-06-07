@@ -33,6 +33,9 @@ export class User extends Base implements IUser {
   @Exclude()
   password: string;
 
+  @Column({ nullable: true, unique: true })
+  phone: string;
+
   @Column({ unique: true })
   @Generated('uuid')
   apiKey: UUID;

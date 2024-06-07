@@ -11,6 +11,7 @@ export interface IUser extends IBase {
   password: string;
   email: string;
   apiKey: UUID;
+  phone: string | null;
   twoFASecret: string | null;
   enable2FA: boolean;
   playLists: IPlayList[] | null;
