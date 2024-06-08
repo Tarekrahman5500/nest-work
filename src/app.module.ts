@@ -16,9 +16,10 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { ArtistController } from './artist/artist.controller';
 import { ArtistModule } from './artist/artist.module';
-import { dataSourceOptions } from '../db/data-source';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeorm from './config/typeorm';
+import validateEngConfig from './config/validateEngConfig';
+import { EnvConfigModule } from './config/env.config.module';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -27,12 +28,16 @@ const proConfig = { port: 8080 };
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      load: [typeorm],
+      load: [typeorm, validateEngConfig],
     }),
     TypeOrmModule.forRootAsync({
       inject: [ConfigService],
-      useFactory: async (configService: ConfigService) =>
-        configService.get('typeorm'),
+      useFactory: async (configService: ConfigService) => {
+        const typeorm = configService.get('typeorm');
+        const validateEnv = configService.get('validateEnv');
+        console.log('TypeORM Configuration:', typeorm, validateEnv); // Log the configuration to debug
+        return typeorm;
+      },
     }),
     SharedModule,
     SongsModule,
@@ -41,6 +46,7 @@ const proConfig = { port: 8080 };
     AuthModule,
     UserModule,
     ArtistModule,
+    EnvConfigModule,
   ],
   controllers: [AppController, ArtistController],
   providers: [
