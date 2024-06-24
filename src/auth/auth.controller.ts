@@ -8,7 +8,11 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { UserService } from '../user/user.service';
-import { ICreateUser, UserCreateDto } from '../user/dto/user.dto';
+import {
+  ICreateUser,
+  UserCreateDto,
+  UserReturnDto,
+} from '../user/dto/user.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { IUser, OmitPasswordUserPromise } from '../user/user.interface';
 import { ILoginDto, LoginDto } from './dto/login.dto';
@@ -20,7 +24,9 @@ import { ITokenDto, TokenDTO } from './dto/token.dto';
 import { UpdateResult } from 'typeorm';
 import { User } from '../user/user.entity';
 import { AuthGuard } from '@nestjs/passport';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('auth')
 @Controller('auth')
 export class AuthController {
   constructor(
@@ -29,7 +35,14 @@ export class AuthController {
   ) {}
 
   @Post('signup')
-  // @ZodSerializerDto(UserReturnDto)
+  @ApiOperation({ summary: 'Register new user' })
+  @ApiResponse({
+    headers: undefined,
+    links: undefined,
+    status: 201,
+    description: 'User created successfully',
+    type: UserReturnDto,
+  })
   async signup(
     @Body(new ZodValidationPipe(UserCreateDto)) userDTO: ICreateUser,
   ): Promise<OmitPasswordUserPromise | null> {

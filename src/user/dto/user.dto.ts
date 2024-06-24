@@ -2,6 +2,7 @@ import { z } from 'nestjs-zod/z';
 import { createZodDto } from 'nestjs-zod';
 import { UUIDSchema } from '../../songs/dto/crate-song-dto';
 import { CreatePlayListSchema } from '../../playlist/dto/create.playList.dto';
+import { ApiProperty } from '@nestjs/swagger';
 
 export interface ICreateUser {
   firstName: string;
@@ -43,4 +44,43 @@ export const userReturnSchema = userCommonFieldsSchema.extend({
 
 export class UserCreateDto extends createZodDto(userCreateSchema) {}
 
-export class UserReturnDto extends createZodDto(userReturnSchema) {}
+export class UserReturnDto extends createZodDto(userReturnSchema) {
+  @ApiProperty({
+    description: 'First name of the user',
+    example: 'John', // Example of an example value
+    required: true,
+    maxLength: 50, // Example of maxLength validation
+  })
+  firstName: string;
+
+  @ApiProperty({
+    description: 'Last name of the user',
+    example: 'Doe',
+    required: true,
+    maxLength: 50,
+  })
+  lastName: string;
+
+  @ApiProperty({
+    description: 'Email address of the user',
+    example: 'john.doe@example.com',
+    required: true,
+  })
+  email: string;
+
+  @ApiProperty({
+    description: 'Password for the user',
+    example: 'password123', // Example of an example value
+    required: true,
+    minLength: 6, // Example of minLength validation
+  })
+  password: string;
+
+  @ApiProperty({
+    description: 'Confirmation of the password',
+    example: 'password123',
+    required: true,
+    minLength: 6,
+  })
+  confirmPassword: string;
+}
