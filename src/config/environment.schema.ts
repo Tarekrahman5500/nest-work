@@ -36,7 +36,8 @@ const environmentSchema = {
   DB_PASSWORD: z.string().default('password'),
   DB_DATABASE: z.string().default('database_name'),
   NODE_ENV: z.string().default('development'),
-  // Add more environment variables and validations as needed
+  SECRET: z.string(),
+  EXPIRE_IN: z.string(),
 };
 
 export default environmentSchema;

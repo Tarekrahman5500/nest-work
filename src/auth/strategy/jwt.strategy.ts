@@ -6,14 +6,18 @@ import { UserService } from '../../user/user.service';
 import { IPayload } from '../types/types';
 import { User } from '../../user/user.entity';
 import { transformUser } from '../../user/utility/transformUse';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class JwtStrategy extends PassportStrategy(Strategy) {
-  constructor(private readonly userService: UserService) {
+  constructor(
+    private readonly userService: UserService,
+    configService: ConfigService,
+  ) {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
       ignoreExpiration: false,
-      secretOrKey: authConstants.secret,
+      secretOrKey: configService.get('validateEnv').SECRET,
     });
   }
 

@@ -15,7 +15,7 @@ import {
 } from '../user/dto/user.dto';
 import { ZodValidationPipe } from 'nestjs-zod';
 import { IUser, OmitPasswordUserPromise } from '../user/user.interface';
-import { ILoginDto, LoginDto } from './dto/login.dto';
+import { ILoginDto, LoginDto, LoginDtoApiRequest } from './dto/login.dto';
 import { AuthService } from './auth.service';
 import { JwtGuard } from './guard/jwt.guard';
 import { CustomRequest } from '../common/constants/custom.request';
@@ -24,7 +24,7 @@ import { ITokenDto, TokenDTO } from './dto/token.dto';
 import { UpdateResult } from 'typeorm';
 import { User } from '../user/user.entity';
 import { AuthGuard } from '@nestjs/passport';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBody, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -53,6 +53,12 @@ export class AuthController {
     }
   }
 
+  @ApiOperation({ summary: 'Login user' })
+  @ApiResponse({
+    status: 200,
+    description: 'User logged in successfully',
+  })
+  @ApiBody({ type: LoginDtoApiRequest }) // Explicitly define the request body schema
   @Post('login')
   async login(@Body(new ZodValidationPipe(LoginDto)) loginDTO: ILoginDto) {
     return await this.authService.login(loginDTO);

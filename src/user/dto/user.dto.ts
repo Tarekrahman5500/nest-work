@@ -70,9 +70,9 @@ export class UserReturnDto extends createZodDto(userReturnSchema) {
 
   @ApiProperty({
     description: 'Password for the user',
-    example: 'password123', // Example of an example value
+    example: 'password123',
     required: true,
-    minLength: 6, // Example of minLength validation
+    minLength: 6,
   })
   password: string;
 
