@@ -15,15 +15,6 @@ async function bootstrap() {
   app.use(morgan('combined'));
   app.setGlobalPrefix('/api/v1/');
   // Apply global interceptors
-  const reflector = app.get(Reflector);
-  app.useGlobalInterceptors(new ClassSerializerInterceptor(reflector));
-  app.useGlobalInterceptors(new ResponseInterceptor());
-
-  // Apply global filters
-  app.useGlobalFilters(new TypeOrmExceptionFilter());
-  app.useGlobalFilters(new AllExceptionsFilter());
-
-  // Swagger setup
   const config = new DocumentBuilder()
     .setTitle('Spotify Clone')
     .setDescription('The Spotify Clone API documentation')

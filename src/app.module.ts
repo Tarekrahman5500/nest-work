@@ -1,8 +1,13 @@
-import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
+import {
+  ClassSerializerInterceptor,
+  MiddlewareConsumer,
+  Module,
+  NestModule,
+} from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { SongsModule } from './songs/songs.module';
-import { APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
+import { APP_FILTER, APP_INTERCEPTOR, Reflector } from '@nestjs/core';
 import { ZodSerializerInterceptor } from 'nestjs-zod';
 import { ZodValidationExceptionFilter } from './error-handler/zodValidationExceptionFilter';
 import { ResponseModule } from './response/response.module';
@@ -20,6 +25,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import typeorm from './config/typeorm';
 import validateEngConfig from './config/validateEngConfig';
 import { EnvConfigModule } from './config/env.config.module';
+import { ResponseInterceptor } from './common/interceptors/responseInterceptor';
+import { AllExceptionsFilter } from './common/interceptors/allExceptionsFilter';
 
 const devConfig = { port: 5000 };
 const proConfig = { port: 8080 };
@@ -57,6 +64,21 @@ const proConfig = { port: 8080 };
     },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     { provide: DevConfigService, useClass: DevConfigService },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: ResponseInterceptor,
+    },
+    {
+      provide: APP_FILTER,
+      useClass: AllExceptionsFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useFactory: (reflector: Reflector) => {
+        return new ClassSerializerInterceptor(reflector);
+      },
+      inject: [Reflector],
+    },
     {
       provide: 'CONFIG',
       useFactory: () => {
